@@ -223,7 +223,7 @@ public class Select2Behavior<T, E> extends Behavior {
 			opts.append("},");
 			
 			if (!ajaxField.getModelObjects().isEmpty()) {
-				opts.append("initSelection:function(e){return ");
+				opts.append("initSelection:function(e, callback){callback( ");
 				if (multiple) {
 					opts.append('[');
 				}
@@ -236,7 +236,7 @@ public class Select2Behavior<T, E> extends Behavior {
 				if (multiple) {
 					opts.append(']');
 				}
-				opts.append(";},");
+				opts.append(");},");
 			}
 			
 			if (settings.isTagging()) {
