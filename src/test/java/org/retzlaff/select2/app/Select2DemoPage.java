@@ -89,6 +89,7 @@ public class Select2DemoPage extends WebPage {
     	Select2Behavior<State, State> e4b = Select2Behavior.forChoice(e4);
     	e4.add(e4b);
     	e4b.getSettings().setMinimumResultsForSearch(4);
+    	e4b.getSettings().addDropdownCss("min-width", "500px");
     	e4.setModel(Model.of(State.CO));
     	e4.setChoices(Arrays.asList(State.CO, State.AZ));
     	add(newLoggingForm("f4", e4));

@@ -1,5 +1,8 @@
 package org.retzlaff.select2;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.time.Duration;
 
@@ -17,25 +20,18 @@ public class Select2Settings implements IClusterable {
 	private boolean allowClear;
 	private int minimumInputLength;
 	private int minimumResultsForSearch;
+	private int maximumSelectionSize;
 	private String placeholderKey;
 	private String noMatchesKey;
 	private String inputTooShortKey;
+	private String selectionTooBigKey;
 	private boolean tagging;
 	private String width = "resolve";
+	private Map<String, String> containerCss = new HashMap<String, String>();
+	private String containerCssClass;
+	private Map<String, String> dropdownCss = new HashMap<String, String>();
+	private String dropdownCssClass;
 	
-	
-	/**
-	 * If set, defines the method used to set the width of the element.
-	 * 
-	 * <p>
-	 * Can be either of, element, copy, resolve or another value used verbatim.
-	 */
-	public String getWidth() {
-		return width;
-	}
-	public void setWidth(String width) {
-		this.width = width;
-	}
 	
 	// AJAX settings
 	
@@ -102,19 +98,23 @@ public class Select2Settings implements IClusterable {
 	}
 
 	/**
+	 * The maximum number of selected elements for a multiple select component.
+	 */
+	public int getMaximumSelectionSize() {
+		return maximumSelectionSize;
+	}
+	public void setMaximumSelectionSize(int maximumSelectionSize) {
+		this.maximumSelectionSize = maximumSelectionSize;
+	}
+
+	/**
 	 * Localization key for "choose one" message.
 	 */
 	public void setPlaceholderKey(String placeholderKey) {
 		this.placeholderKey = placeholderKey;
 	}
 	public String getPlaceholderKey() {
-		if (placeholderKey != null) {
-			return placeholderKey;
-		}
-		if (isAllowClear()) {
-			return "null"; // AbstractSingleSelectChoice default: Choose One
-		}
-		return null;
+		return placeholderKey;
 	}
 
 	/**
@@ -136,6 +136,16 @@ public class Select2Settings implements IClusterable {
 	public String getInputTooShortKey() {
 		return inputTooShortKey;
 	}
+
+	/**
+	 * Localization key for "selection too big" message. The maximum number of selected elements is available as ${}.
+	 */
+	public String getSelectionTooBigKey() {
+		return selectionTooBigKey;
+	}
+	public void setSelectionTooBigKey(String selectionTooBigKey) {
+		this.selectionTooBigKey = selectionTooBigKey;
+	}
 	
 	/**
 	 * If set, the search string will be available for selection.
@@ -149,6 +159,59 @@ public class Select2Settings implements IClusterable {
 	}
 	public boolean isTagging() {
 		return tagging;
+	}
+	
+	/**
+	 * If set, defines the method used to set the width of the element.
+	 * 
+	 * <p>
+	 * Can be either of, element, copy, resolve or another value used verbatim.
+	 */
+	public String getWidth() {
+		return width;
+	}
+	public void setWidth(String width) {
+		this.width = width;
+	}
+	
+	/**
+	 * Contains the key-value pairs for inline css that will be added to select2's container.
+	 */
+	public Map<String, String> getContainerCss() {
+		return containerCss;
+	}
+	public void addContainerCss(String key, String value) {
+		containerCss.put(key, value);
+	}
+	
+	/**
+	 * Contains the css class that will be added to select2's container.
+	 */
+	public String getContainerCssClass() {
+		return containerCssClass;
+	}
+	public void setContainerCssClass(String containerCssClass) {
+		this.containerCssClass = containerCssClass;
+	}
+	
+	/**
+	 * Contains the key-value pairs for inline css that will be added to select2's dropdown container.
+	 */
+	public Map<String, String> getDropdownCss() {
+		return dropdownCss;
+	}
+	public void addDropdownCss(String key, String value) {
+		dropdownCss.put(key, value);
+	}
+	
+	/**
+	 * Contains the css class that will be added to select2's dropdown container.
+	 */
+	public String getDropdownCssClass() {
+		return dropdownCssClass;
+	}
+	public void setDropdownCssClass(String dropdownCssClass) {
+		this.dropdownCssClass = dropdownCssClass;
 	}
 	
 }

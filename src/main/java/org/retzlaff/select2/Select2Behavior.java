@@ -1,6 +1,9 @@
 package org.retzlaff.select2;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.IResourceListener;
@@ -121,6 +124,17 @@ public class Select2Behavior<T, E> extends Behavior {
 	
 	@Override
 	public void renderHead(Component component, IHeaderResponse response) {
+		AbstractSingleSelectChoice<?> singleSelectChoice = null;
+		if (component instanceof AbstractSingleSelectChoice<?>) {
+			singleSelectChoice = (AbstractSingleSelectChoice<?>) component;
+			if (!singleSelectChoice.isNullValid()) {
+				if (settings.getPlaceholderKey() == null) {
+					settings.setPlaceholderKey("null");
+				}
+				singleSelectChoice.setNullValid(true);
+			}
+		}
+		
 		response.render(CssHeaderItem.forReference(Select2CssResourceReference.get()));
 		response.render(JavaScriptHeaderItem.forReference(Select2JavaScriptResourceReference.get()));
 		
@@ -142,9 +156,38 @@ public class Select2Behavior<T, E> extends Behavior {
 			opts.append("minimumResultsForSearch:").append(settings.getMinimumResultsForSearch()).append(',');
 		}
 		
+		if (multiple && settings.getMaximumSelectionSize() > 0) {
+			opts.append("maximumSelectionSize:").append(settings.getMaximumSelectionSize()).append(',');
+		}
+		
+		boolean hasPlaceholder = false;
 		if (settings.getPlaceholderKey() != null) {
 			String msg = component.getLocalizer().getStringIgnoreSettings(settings.getPlaceholderKey(), component, null, null);
 			opts.append("placeholder:").append(escape(msg)).append(",");
+			hasPlaceholder = true;
+		} else if (settings.isAllowClear()) {
+			opts.append("placeholder:").append(escape(" ")).append(",");
+			hasPlaceholder = true;
+		}
+		
+		if (!settings.getContainerCss().isEmpty()) {
+			opts.append("containerCss: { ");
+			appendMap(opts, settings.getContainerCss());
+			opts.append("},");
+		}
+		
+		if (settings.getContainerCssClass() != null) {
+			opts.append("containerCssClass: ").append(escape(settings.getContainerCssClass())).append(",");
+		}
+		
+		if (!settings.getDropdownCss().isEmpty()) {
+			opts.append("dropdownCss: { ");
+			appendMap(opts, settings.getDropdownCss());
+			opts.append("},");
+		}
+		
+		if (settings.getDropdownCssClass() != null) {
+			opts.append("dropdownCssClass: ").append(escape(settings.getDropdownCssClass())).append(",");
 		}
 
 		if (settings.isAllowClear()) {
@@ -160,6 +203,12 @@ public class Select2Behavior<T, E> extends Behavior {
 			String msg = component.getLocalizer().getStringIgnoreSettings(settings.getInputTooShortKey(), component, 
 					Model.of(settings.getMinimumInputLength()), null);
 			opts.append("formatInputTooShort:function(){return ").append(escape(msg)).append(";},");
+		}
+		
+		if (multiple && settings.getSelectionTooBigKey() != null) {
+			String msg = component.getLocalizer().getStringIgnoreSettings(settings.getSelectionTooBigKey(), component, 
+					Model.of(settings.getMaximumSelectionSize()), null);
+			opts.append("formatSelectionTooBig:function(){return ").append(escape(msg)).append(";},");
 		}
 
 		if (ajaxField != null) {
@@ -205,7 +254,7 @@ public class Select2Behavior<T, E> extends Behavior {
 		
 		// HACK: remove the null-value option from AbstractSingleSelectChoice#getDefaultChoice().
 		// Select2 has its own way of handling null.
-		if (choiceField instanceof AbstractSingleSelectChoice && "".equals(choiceField.getValue())) {
+		if (!hasPlaceholder && choiceField instanceof AbstractSingleSelectChoice && "".equals(choiceField.getValue())) {
 			js.append("$('#").append(component.getMarkupId()).append(" option[value=\"\"]').remove()");
 		}
 		
@@ -245,6 +294,20 @@ public class Select2Behavior<T, E> extends Behavior {
 	
 	private CharSequence escape(Object object) {
 		return "'" + object.toString().replace("'", "\\'") + "'";
+	}
+	
+	private void appendMap(StringBuilder sb, Map<?, ?> map) {
+		Set<?> keySet = map.keySet();
+		Iterator<?> it = keySet.iterator();
+		while (it.hasNext()) {
+			final Object key = it.next();
+			sb.append(escape(key))
+				.append(": ")
+				.append(escape(map.get(key)));
+			if (it.hasNext()) {
+				sb.append(",");
+			}
+		}
 	}
 	
 	/**
