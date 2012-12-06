@@ -210,6 +210,16 @@ public class Select2Behavior<T, E> extends Behavior {
 					Model.of(settings.getMaximumSelectionSize()), null);
 			opts.append("formatSelectionTooBig:function(){return ").append(escape(msg)).append(";},");
 		}
+		
+		String matcher = settings.getMatcher();
+		if (matcher != null) {
+			opts.append("matcher: ").append(matcher).append(",");
+		}
+		
+		String formatResult = settings.getFormatResult();
+		if (formatResult != null) {
+			opts.append("formatResult: ").append(formatResult).append(",");
+		}
 
 		if (ajaxField != null) {
 			opts.append("ajax:{");

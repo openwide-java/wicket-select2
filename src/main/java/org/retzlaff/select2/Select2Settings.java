@@ -31,7 +31,8 @@ public class Select2Settings implements IClusterable {
 	private String containerCssClass;
 	private Map<String, String> dropdownCss = new HashMap<String, String>();
 	private String dropdownCssClass;
-	
+	private String matcher;
+	private String formatResult;
 	
 	// AJAX settings
 	
@@ -212,6 +213,26 @@ public class Select2Settings implements IClusterable {
 	}
 	public void setDropdownCssClass(String dropdownCssClass) {
 		this.dropdownCssClass = dropdownCssClass;
+	}
+	
+	/**
+	 * Used to determine whether or not the search term matches an option when a built-in query function is used.
+	 */
+	public String getMatcher() {
+		return matcher;
+	}
+	public void setMatcher(String matcher) {
+		this.matcher = matcher;
+	}
+	
+	/**
+	 * Function used to render a result that the user can select.
+	 */
+	public String getFormatResult() {
+		return formatResult;
+	}
+	public void setFormatResult(String formatResult) {
+		this.formatResult = formatResult;
 	}
 	
 }
