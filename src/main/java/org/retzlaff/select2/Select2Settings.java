@@ -23,6 +23,7 @@ public class Select2Settings implements IClusterable {
 	private int maximumSelectionSize;
 	private String placeholderKey;
 	private String noMatchesKey;
+	private String searchingKey;
 	private String inputTooShortKey;
 	private String selectionTooBigKey;
 	private boolean tagging;
@@ -128,6 +129,16 @@ public class Select2Settings implements IClusterable {
 		return noMatchesKey;
 	}
 
+	/**
+	 * Localization key for "searching" message.
+	 */
+	public void setSearchingKey(String searchingKey) {
+		this.searchingKey = searchingKey;
+	}
+	public String getSearchingKey() {
+		return searchingKey;
+	}
+	
 	/**
 	 * Localization key for "input too short" message. The minimum length is available as ${}.
 	 */

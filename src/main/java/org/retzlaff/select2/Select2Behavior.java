@@ -205,6 +205,11 @@ public class Select2Behavior<T, E> extends Behavior {
 			opts.append("formatInputTooShort:function(){return ").append(escape(msg)).append(";},");
 		}
 		
+		if (settings.getSearchingKey() != null) {
+			String msg = component.getLocalizer().getStringIgnoreSettings(settings.getSearchingKey(), component, null, null);
+			opts.append("formatSearching:function(){return ").append(escape(msg)).append(";},");
+		}
+		
 		if (multiple && settings.getSelectionTooBigKey() != null) {
 			String msg = component.getLocalizer().getStringIgnoreSettings(settings.getSelectionTooBigKey(), component, 
 					Model.of(settings.getMaximumSelectionSize()), null);
