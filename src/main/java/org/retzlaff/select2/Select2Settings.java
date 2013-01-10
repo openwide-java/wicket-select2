@@ -34,6 +34,7 @@ public class Select2Settings implements IClusterable {
 	private String dropdownCssClass;
 	private String matcher;
 	private String formatResult;
+	private String createSearchChoice;
 	
 	// AJAX settings
 	
@@ -244,6 +245,16 @@ public class Select2Settings implements IClusterable {
 	}
 	public void setFormatResult(String formatResult) {
 		this.formatResult = formatResult;
+	}
+	
+	/**
+	 * Function used to create a new selectable choice from user's search term.
+	 */
+	public String getCreateSearchChoice() {
+		return createSearchChoice;
+	}
+	public void setCreateSearchChoice(String createSearchChoice) {
+		this.createSearchChoice = createSearchChoice;
 	}
 	
 }

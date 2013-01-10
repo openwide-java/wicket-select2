@@ -225,6 +225,11 @@ public class Select2Behavior<T, E> extends Behavior {
 		if (formatResult != null) {
 			opts.append("formatResult: ").append(formatResult).append(",");
 		}
+		
+		String createSearchChoice = settings.getCreateSearchChoice();
+		if (createSearchChoice != null) {
+			opts.append("createSearchChoice: ").append(createSearchChoice).append(",");
+		}
 
 		if (ajaxField != null) {
 			opts.append("ajax:{");
@@ -254,7 +259,7 @@ public class Select2Behavior<T, E> extends Behavior {
 				opts.append(");},");
 			}
 			
-			if (settings.isTagging()) {
+			if (createSearchChoice == null && settings.isTagging()) {
 				opts.append("createSearchChoice:function(q){return {id:q,text:q};},");
 			}
 		}
