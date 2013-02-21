@@ -118,8 +118,8 @@ the specific language governing permissions and limitations under the Apache Lic
         if (a === b) return true;
         if (a === undefined || b === undefined) return false;
         if (a === null || b === null) return false;
-        if (a.constructor === String) return a === b+'';
-        if (b.constructor === String) return b === a+'';
+        if (a.constructor === String) return a+'' === b+''; // IE requires a+'' instead of just a
+        if (b.constructor === String) return b+'' === a+''; // IE requires b+'' instead of just b
         return false;
     }
 
@@ -1707,7 +1707,6 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.clear();
                 killEventImmediately(e);
                 this.close();
-                this.triggerChange();
                 this.selection.focus();
             }));
 
@@ -1750,13 +1749,15 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         clear: function() {
             var data=this.selection.data("select2-data");
-            this.opts.element.val("");
-            this.selection.find("span").empty();
-            this.selection.removeData("select2-data");
-            this.setPlaceholder();
+            if (data) { // guard against queued quick consecutive clicks
+                this.opts.element.val("");
+                this.selection.find("span").empty();
+                this.selection.removeData("select2-data");
+                this.setPlaceholder();
 
-            this.opts.element.trigger({ type: "removed", val: this.id(data), choice: data });
-            this.triggerChange({removed:data});
+                this.opts.element.trigger({ type: "removed", val: this.id(data), choice: data });
+                this.triggerChange({removed:data});
+            }
         },
 
         /**
