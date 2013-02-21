@@ -35,6 +35,7 @@ public class Select2Settings implements IClusterable {
 	private String matcher;
 	private String formatResult;
 	private String createSearchChoice;
+	private String textEncoding;
 	
 	// AJAX settings
 	
@@ -255,6 +256,16 @@ public class Select2Settings implements IClusterable {
 	}
 	public void setCreateSearchChoice(String createSearchChoice) {
 		this.createSearchChoice = createSearchChoice;
+	}
+	
+	/**
+	 * Sets the text encoding used for Ajax requests
+	 */
+	public String getTextEncoding() {
+		return textEncoding;
+	}
+	public void setTextEncoding(String textEncoding) {
+		this.textEncoding = textEncoding;
 	}
 	
 }

@@ -75,6 +75,9 @@ public abstract class AbstractSelect2Choice<T, E> extends HiddenField<T> impleme
 		protected ResourceResponse newResourceResponse(Attributes attributes) {
 			ResourceResponse response = new ResourceResponse();
 			response.setContentType("text/javascript");
+			if (getSettings().getTextEncoding() != null) {
+				response.setTextEncoding(getSettings().getTextEncoding());
+			}
 			response.setCacheDuration(getSettings().getAjaxCacheDuration());
 			response.setWriteCallback(new WriteCallback() {
 				@Override
