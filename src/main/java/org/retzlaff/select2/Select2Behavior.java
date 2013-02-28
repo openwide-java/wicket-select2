@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.IResourceListener;
+import org.apache.wicket.Session;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -23,6 +24,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.retzlaff.select2.resource.Select2CssResourceReference;
 import org.retzlaff.select2.resource.Select2JavaScriptResourceReference;
+import org.retzlaff.select2.resource.Select2LocaleJavaScriptResourceReference;
 
 /**
  * Select2 drop down decorator
@@ -137,6 +139,7 @@ public class Select2Behavior<T, E> extends Behavior {
 		
 		response.render(CssHeaderItem.forReference(Select2CssResourceReference.get()));
 		response.render(JavaScriptHeaderItem.forReference(Select2JavaScriptResourceReference.get()));
+		response.render(JavaScriptHeaderItem.forReference(Select2LocaleJavaScriptResourceReference.get(Session.get().getLocale())));
 		
 		StringBuilder opts = new StringBuilder();
 		
