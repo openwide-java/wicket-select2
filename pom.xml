@@ -4,7 +4,7 @@
 	<groupId>org.retzlaff</groupId>
 	<artifactId>wicket-select2</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.4-SNAPSHOT</version>
+	<version>1.1.4</version>
 
 	<name>wicket-select2</name>
 	<description>Wicket components and behaviors for Select2</description>
