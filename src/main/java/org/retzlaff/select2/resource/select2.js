@@ -284,7 +284,8 @@ the specific language governing permissions and limitations under the Apache Lic
         var classes, replacements = [], adapted;
 
         classes = dest.attr("class");
-        if (typeof classes === "string") {
+        if (classes) {
+            classes = '' + classes; // for IE which returns object
             $(classes.split(" ")).each2(function() {
                 if (this.indexOf("select2-") === 0) {
                     replacements.push(this);
@@ -292,11 +293,12 @@ the specific language governing permissions and limitations under the Apache Lic
             });
         }
         classes = src.attr("class");
-        if (typeof classes === "string") {
+        if (classes) {
+            classes = '' + classes; // for IE which returns object
             $(classes.split(" ")).each2(function() {
                 if (this.indexOf("select2-") !== 0) {
                     adapted = adapter(this);
-                    if (typeof adapted === "string" && adapted.length > 0) {
+                    if (adapted) {
                         replacements.push(this);
                     }
                 }
@@ -1121,9 +1123,7 @@ the specific language governing permissions and limitations under the Apache Lic
             this.dropdown.attr("id", "select2-drop");
 
             // show the elements
-            mask.css({
-                width: document.documentElement.scrollWidth,
-                height: document.documentElement.scrollHeight});
+            mask.css(_makeMaskCss());
             mask.show();
             this.dropdown.show();
             this.positionDropdown();
@@ -1136,14 +1136,19 @@ the specific language governing permissions and limitations under the Apache Lic
             var that = this;
             this.container.parents().add(window).each(function () {
                 $(this).bind(resize+" "+scroll+" "+orient, function (e) {
-                    $("#select2-drop-mask").css({
-                        width:document.documentElement.scrollWidth,
-                        height:document.documentElement.scrollHeight});
+                    $("#select2-drop-mask").css(_makeMaskCss());
                     that.positionDropdown();
                 });
             });
 
             this.focusSearch();
+
+            function _makeMaskCss() {
+                return {
+                    width  : Math.max(document.documentElement.scrollWidth,  $(window).width()),
+                    height : Math.max(document.documentElement.scrollHeight, $(window).height())
+                }
+            }
         },
 
         // abstract
@@ -1317,6 +1322,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
 
                     self.opts.populateResults.call(this, results, data.results, {term: term, page: page, context:context});
+                    self.postprocessResults(data, false, false);
 
                     if (data.more===true) {
                         more.detach().appendTo(results).text(self.opts.formatLoadMore(page+1));
@@ -1811,13 +1817,18 @@ the specific language governing permissions and limitations under the Apache Lic
                 // install default initSelection when applied to hidden input and data is local
                 opts.initSelection = opts.initSelection || function (element, callback) {
                     var id = element.val();
-                    //search in data by id
+                    //search in data by id, storing the actual matching item
+                    var match = null;
                     opts.query({
                         matcher: function(term, text, el){
-                            return equal(id, opts.id(el));
+                            var is_match = equal(id, opts.id(el));
+                            if (is_match) {
+                                match = el;
+                            }
+                            return is_match;
                         },
-                        callback: !$.isFunction(callback) ? $.noop : function(filtered) {
-                            callback(filtered.results.length ? filtered.results[0] : null);
+                        callback: !$.isFunction(callback) ? $.noop : function() {
+                            callback(match);
                         }
                     });
                 };
@@ -1856,7 +1867,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        postprocessResults: function (data, initial) {
+        postprocessResults: function (data, initial, noHighlightUpdate) {
             var selected = 0, self = this, showSearchInput = true;
 
             // find the selected element in the result list
@@ -1869,8 +1880,9 @@ the specific language governing permissions and limitations under the Apache Lic
             });
 
             // and highlight it
-
-            this.highlight(selected);
+            if (noHighlightUpdate !== false) {
+                this.highlight(selected);
+            }
 
             // hide the search box if this is the first we got the results and there are a few of them
 
@@ -2044,15 +2056,20 @@ the specific language governing permissions and limitations under the Apache Lic
                 // install default initSelection when applied to hidden input and data is local
                 opts.initSelection = opts.initSelection || function (element, callback) {
                     var ids = splitVal(element.val(), opts.separator);
-                    //search in data by array of ids
+                    //search in data by array of ids, storing matching items in a list
+                    var matches = [];
                     opts.query({
                         matcher: function(term, text, el){
-                            return $.grep(ids, function(id) {
+                            var is_match = $.grep(ids, function(id) {
                                 return equal(id, opts.id(el));
                             }).length;
+                            if (is_match) {
+                                matches.push(el);
+                            }
+                            return is_match;
                         },
-                        callback: !$.isFunction(callback) ? $.noop : function(filtered) {
-                            callback(filtered.results);
+                        callback: !$.isFunction(callback) ? $.noop : function() {
+                            callback(matches);
                         }
                     });
                 };
@@ -2220,7 +2237,8 @@ the specific language governing permissions and limitations under the Apache Lic
             if (placeholder !== undefined  && this.getVal().length === 0 && this.search.hasClass("select2-focused") === false) {
                 this.search.val(placeholder).addClass("select2-default");
                 // stretch the search box to full width of the container so as much of the placeholder is visible as possible
-                this.resizeSearch();
+                // we could call this.resizeSearch(), but we do not because that requires a sizer and we do not want to create one so early because of a firefox bug, see #944
+                this.search.width(this.getMaxSearchWidth());
             } else {
                 this.search.val("").width(10);
             }
@@ -2309,7 +2327,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 if (this.countSelectableResults()>0) {
                     this.search.width(10);
                     this.resizeSearch();
-                    if (this.val().length >= this.getMaximumSelectionSize()) {
+                    if (this.getMaximumSelectionSize() > 0 && this.val().length >= this.getMaximumSelectionSize()) {
                         // if we reached max selection size repaint the results so choices
                         // are replaced with the max selection reached message
                         this.updateResults(true);
@@ -2445,6 +2463,11 @@ the specific language governing permissions and limitations under the Apache Lic
                 self.highlight(0);
             }
 
+        },
+
+        // multi
+        getMaxSearchWidth: function() {
+            return this.selection.width() - getSideBorderPadding(this.search);
         },
 
         // multi
@@ -2682,7 +2705,7 @@ the specific language governing permissions and limitations under the Apache Lic
         maximumSelectionSize: 0,
         id: function (e) { return e.id; },
         matcher: function(term, text) {
-            return text.toUpperCase().indexOf(term.toUpperCase()) >= 0;
+            return (''+text).toUpperCase().indexOf((''+term).toUpperCase()) >= 0;
         },
         separator: ",",
         tokenSeparators: [],
