@@ -44,6 +44,7 @@ public class Select2DemoPage extends WebPage {
     	// Simple, static content
     	//
     	DropDownChoice<State> e1 = new DropDownChoice<State>("e1") {
+    		@Override
     		protected void onSelectionChanged(State newSelection) {
     			LOG.info("e1 selection changed: {}", newSelection);
     		}

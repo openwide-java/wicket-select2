@@ -42,6 +42,7 @@ public class Select2TagAdapter implements ISelect2AjaxAdapter<String> {
 	/**
 	 * Returns a page of tags that contain the filter (case insensitive)
 	 */
+	@Override
 	public List<String> getChoices(int start, int count, String filter) {
 		
 		if (Strings.isEmpty(filter)) {
