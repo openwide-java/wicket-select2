@@ -142,6 +142,7 @@ public class Select2Behavior<T, E> extends Behavior {
 		response.render(JavaScriptHeaderItem.forReference(Select2LocaleJavaScriptResourceReference.get(Session.get().getLocale())));
 		
 		StringBuilder opts = new StringBuilder();
+		StringBuilder defaultData = new StringBuilder();
 		
 		if (multiple && component instanceof HiddenField) {
 			opts.append("multiple:true,");
@@ -246,20 +247,20 @@ public class Select2Behavior<T, E> extends Behavior {
 			opts.append("},");
 			
 			if (!ajaxField.getModelObjects().isEmpty()) {
-				opts.append("initSelection:function(e, callback){callback( ");
+				defaultData.append(".select2('data', ");
 				if (multiple) {
-					opts.append('[');
+					defaultData.append('[');
 				}
 				for (E object : ajaxField.getModelObjects()) {
 					String id = ajaxField.getAdapter().getChoiceId(object);
 					Object value = ajaxField.getAdapter().getDisplayValue(object);
-					opts.append("{id:").append(escape(id)).append(",text:").append(escape(value)).append("},");
+					defaultData.append("{id:").append(escape(id)).append(",text:").append(escape(value)).append("},");
 				}
-				opts.setLength(opts.length() - 1); // trailing comma
+				defaultData.setLength(defaultData.length() - 1); // trailing comma
 				if (multiple) {
-					opts.append(']');
+					defaultData.append(']');
 				}
-				opts.append(");},");
+				defaultData.append(")");
 			}
 			
 			if (createSearchChoice == null && settings.isTagging()) {
@@ -273,7 +274,7 @@ public class Select2Behavior<T, E> extends Behavior {
 			opts.setLength(opts.length() - 1); // trailing comma
 			js.append('{').append(opts).append('}');
 		}
-		js.append(");");
+		js.append(")").append(defaultData).append(";");
 		
 		// HACK: remove the null-value option from AbstractSingleSelectChoice#getDefaultChoice().
 		// Select2 has its own way of handling null.
