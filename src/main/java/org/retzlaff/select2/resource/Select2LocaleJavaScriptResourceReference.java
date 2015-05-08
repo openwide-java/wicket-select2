@@ -17,7 +17,7 @@ public final class Select2LocaleJavaScriptResourceReference extends JQueryPlugin
 	}
 	
 	@Override
-	public Iterable<? extends HeaderItem> getDependencies() {
+	public List<HeaderItem> getDependencies() {
 		List<HeaderItem> dependencies = new ArrayList<HeaderItem>(1);
 		dependencies.add(JavaScriptHeaderItem.forReference(Select2JavaScriptResourceReference.get()));
 		

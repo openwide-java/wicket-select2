@@ -16,6 +16,7 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.AbstractChoice;
 import org.apache.wicket.markup.html.form.AbstractSingleSelectChoice;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -94,7 +95,7 @@ public class Select2Behavior<T, E> extends Behavior {
 			return choiceField.getChoiceRenderer();
 		}
 		
-		return new IChoiceRenderer<E>() {
+		return new ChoiceRenderer<E>() {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
