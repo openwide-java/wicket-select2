@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.IResourceListener;
 import org.apache.wicket.Session;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
@@ -16,13 +15,10 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.AbstractChoice;
 import org.apache.wicket.markup.html.form.AbstractSingleSelectChoice;
-import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.HiddenField;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.retzlaff.select2.resource.Select2CssResourceReference;
 import org.retzlaff.select2.resource.Select2JavaScriptResourceReference;
 import org.retzlaff.select2.resource.Select2LocaleJavaScriptResourceReference;
@@ -88,26 +84,6 @@ public class Select2Behavior<T, E> extends Behavior {
 			return choiceField.getChoices();
 		}
 		return null;
-	}
-	
-	protected IChoiceRenderer<? super E> getChoiceRenderer() {
-		if (choiceField != null) {
-			return choiceField.getChoiceRenderer();
-		}
-		
-		return new ChoiceRenderer<E>() {
-			private static final long serialVersionUID = 1L;
-			
-			@Override
-			public String getIdValue(E object, int index) {
-				return ajaxField.getAdapter().getChoiceId(object);
-			}
-			
-			@Override
-			public Object getDisplayValue(E object) {
-				return ajaxField.getAdapter().getDisplayValue(object);
-			}
-		};
 	}
 	
 	// behavior overrides
@@ -238,7 +214,8 @@ public class Select2Behavior<T, E> extends Behavior {
 
 		if (ajaxField != null) {
 			opts.append("ajax:{");
-			opts.append("url:'").append(ajaxField.urlFor(IResourceListener.INTERFACE, new PageParameters())).append("',");
+			
+			opts.append("url:'").append(ajaxField.getAjaxUrl()).append("',");
 			opts.append("dataType:'jsonp',");
 			if (settings.getQuietMillis() > 0) {
 				opts.append("quietMillis:").append(settings.getQuietMillis()).append(',');
@@ -291,30 +268,6 @@ public class Select2Behavior<T, E> extends Behavior {
 		if (multiple && !(component instanceof HiddenField)) {
 			tag.put("multiple", "");
 		}
-	}
-
-	/**
-	 * Formats choices in JSON using the choice renderer
-	 */
-	CharSequence renderChoices(List<? extends E> choices, int index) {
-		if (choices == null || choices.isEmpty()) {
-			return "[]";
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		
-		IChoiceRenderer<? super E> r = getChoiceRenderer();
-		for (E object : choices) {
-			String id = r.getIdValue(object, index++);
-			Object value = r.getDisplayValue(object);
-			
-			sb.append("{id:").append(escape(id)).append(",text:").append(escape(value)).append("},");
-		}
-		
-		sb.setLength(sb.length() - 1); // trailing comma
-		sb.append(']');
-		return sb;
 	}
 	
 	private CharSequence escape(Object object) {
